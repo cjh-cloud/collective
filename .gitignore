@@ -1,0 +1,8 @@
+node_modules/
+# Connor's additions
+metrics-server-0.3.6/
+v0.3.6.tar.gz
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
