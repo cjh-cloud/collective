@@ -1,0 +1,77 @@
+# Tutorial I'm following
+# - not needed anymore since all defined in TF now
+#   however, it is a good reference, and can still do
+#   kubectl create -f deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-kubernetes
+spec:
+  selector:
+    matchLabels:
+      name: hello-kubernetes
+  template:
+    metadata:
+      labels:
+        name: hello-kubernetes
+    spec:
+      containers:
+        - name: app
+          image: paulbouwer/hello-kubernetes:1.8
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-kubernetes
+spec:
+  type: NodePort #LoadBalancer # Don't need this as we want ingress now
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    name: hello-kubernetes
+
+---
+
+# Ingress
+
+# apiVersion: extensions/v1beta1 # - this is deprecated?
+# kind: Ingress
+# metadata:
+#   name: hello-kubernetes
+#   annotations:
+#     alb.ingress.kubernetes.io/scheme: internet-facing # can be configured to use internal or public-facing load balancers
+#     kubernetes.io/ingress.class: alb # is used to select the right ingress controller in the cluster
+# spec:
+#   rules:
+#     - http:
+#         paths:
+#           - path: /
+#             backend:
+#               serviceName: hello-kubernetes
+#               servicePort: 80
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-kubernetes
+  annotations:
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+    alb.ingress.kubernetes.io/scheme: internet-facing # can be configured to use internal or public-facing load balancers
+    kubernetes.io/ingress.class: alb # is used to select the right ingress controller in the cluster
+spec:
+  # ingressClassName: hello-example
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix # Exact means other resources like /main.css and /kubernetes.png don't load
+        backend:
+          service:
+            name: hello-kubernetes
+            port:
+              number: 80

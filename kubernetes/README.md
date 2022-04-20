@@ -1,3 +1,30 @@
+
+
+Directories:
+- learnk8s/ https://learnk8s.io/terraform-eks - useful tutorial
+- learn-terraform-provision-eks-cluster/ - tf docs tutorial to create eks cluster
+- learn-terraform-deploy-nginx-kubernetes/ - requires eks cluster created by above directory 
+
+Useful links:
+https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller - used in learnk8s/
+
+Works for the learn-*/ dirs
+aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
+
+Works for the learnk8s/ dir (should make it like above)
+aws eks --region ap-southeast-2 update-kubeconfig --name my-cluster
+
+kubectl describe services test-kubernetes
+kubectl describe ingress test-kubernetes
+kubectl port-forward terraform-example-dbfb6847f-fpjp4 8080:8080
+kubectl get pods --output=wide 
+kubectl get services 
+kubectl describe replicasets 
+kubectl get replicasets
+
+
+---
+
 apiVersion:
 kind:
 metadata:
