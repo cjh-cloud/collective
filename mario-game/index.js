@@ -1,8 +1,11 @@
+// import platform from './img/platform.png';
+
+
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d'); // 2d game canvas context
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 1024; // window.innerWidth;
+canvas.height = 576 // window.innerHeight;
 
 const gravity = 0.5;
 
@@ -38,26 +41,37 @@ class Player {
 }
 
 class Platform {
-  constructor({x, y}) {
+  constructor({x, y, image}) {
     this.position = {
       x, // same as x: x
-      y
+      y,
     }
-    this.width = 200;
-    this.height = 20;
+    this.image = image;
+    this.width = image.width;
+    this.height = image.height;
+
   }
 
   draw() {
-    c.fillStyle = 'blue';
-    c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    c.drawImage(this.image, this.position.x, this.position.y);
+    // c.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
+
+const image = new Image();
+image.src = './img/platform.png';
+image.width = 580;
+image.height = 125;
+// const platform = new Image();
+// platform.src = './img/platform.png'
+
+console.log(image.width);
 
 // !
 const player = new Player();
 const platforms = [
-  new Platform({x: 200, y: 100}),
-  new Platform({x: 500, y: 200})
+  new Platform({x: -1, y: 470, image}),
+  new Platform({x: image.width - 3, y: 470, image})
 ];
 
 const keys = {
@@ -73,11 +87,15 @@ let scrollOffset = 0; // how far have our platforms scrolled off screen
 
 function animate() {
   requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height); // clear the canvas
-  player.update();
+  c.fillStyle = 'white';
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  // c.clearRect(0, 0, canvas.width, canvas.height); // clear the canvas
+
   platforms.forEach(platform => {
     platform.draw();
   });
+
+  player.update(); // draw player last
 
   // player can't move past a certain point, and background starts scrolling
   if (keys.right.pressed && player.position.x < 400) {
