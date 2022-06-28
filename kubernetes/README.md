@@ -14,6 +14,16 @@ aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terr
 Works for the learnk8s/ dir (should make it like above)
 aws eks --region ap-southeast-2 update-kubeconfig --name my-cluster
 
+allow aws user access to EKS cluster
+`$ kubectl edit configmap aws-auth -n kube-system`
+mapUsers: |
+    - userarn: arn:aws:iam::ACCOUNT_ID:user/USERNAME
+      username: USERNAME
+      groups:
+        systems:masters
+
+-----
+
 kubectl describe services test-kubernetes
 kubectl describe ingress test-kubernetes
 kubectl port-forward terraform-example-dbfb6847f-fpjp4 8080:8080
