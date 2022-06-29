@@ -16,6 +16,9 @@ terraform {
       source = "hashicorp/kubernetes"
       version = "2.10.0"
     }
+    helm = {
+      version = "2.5.0"
+    }
   }
 }
 
@@ -60,13 +63,12 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "17.24.0" # 12.2.0
+  version = "17.24.0" # 18.21.0  12.2.0
 
   cluster_name    = "${local.cluster_name}"
   cluster_version = "1.22" # 1.17
-  subnets         = module.vpc.private_subnets
-
-  vpc_id = module.vpc.vpc_id
+  subnets      = module.vpc.private_subnets # version 17.24.0 it was just "subnets"
+  vpc_id          = module.vpc.vpc_id
 
   node_groups = {
     first = {
@@ -88,8 +90,94 @@ module "eks" {
   write_kubeconfig   = true
 #   config_output_path = "./"
 
-  workers_additional_policies = [aws_iam_policy.worker_policy.arn]
+  workers_additional_policies = [aws_iam_policy.worker_policy.arn] # ingress controller permissions
+
+  workers_group_defaults = {
+    root_volume_type = "gp2"
+  }
+
+  # worker_groups = [
+  #   {
+  #     name                          = "worker-group-1"
+  #     instance_type                 = "t2.small"
+  #     additional_userdata           = "echo foo bar"
+  #     additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
+  #     asg_desired_capacity          = 2
+  #   },
+  #   {
+  #     name                          = "worker-group-2"
+  #     instance_type                 = "t2.medium"
+  #     additional_userdata           = "echo foo bar"
+  #     additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
+  #     asg_desired_capacity          = 1
+  #   },
+  # ]
+
+  # eks_managed_node_group_defaults = {
+  #   ami_type       = "AL2_x86_64"
+  #   instance_types = ["t3.large"]
+
+  #   attach_cluster_primary_security_group = true
+  #   # vpc_security_group_ids                = [aws_security_group.additional.id]
+
+  #   # iam_role_additional_policies = [aws_iam_policy.worker_policy.arn] # ingress controller permissions # ! doesn't work with the module
+
+  # }
+
+  # eks_managed_node_groups = {
+  #   # Default node group - as provided by AWS EKS
+  #   # default_node_group = {
+
+  #   # }
+  #   # blue = {}
+  #   green = {
+  #     min_size     = 2
+  #     max_size     = 10
+  #     desired_size = 2
+
+  #     instance_types = ["t3.large"]
+  #     capacity_type  = "SPOT"
+  #     labels = {
+  #       Environment = "test"
+  #       GithubRepo  = "terraform-aws-eks"
+  #       GithubOrg   = "terraform-aws-modules"
+  #     }
+
+  #     # taints = {
+  #     #   dedicated = {
+  #     #     key    = "dedicated"
+  #     #     value  = "gpuGroup"
+  #     #     effect = "NO_SCHEDULE"
+  #     #   }
+  #     # }
+
+  #     update_config = {
+  #       max_unavailable_percentage = 50 # or set `max_unavailable`
+  #     }
+
+  #     tags = {
+  #       ExtraTag = "example"
+  #     }
+  #   }
+  # }
+
 }
+
+# https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.16.0 - search "invalid for_each argument"
+# resource "aws_iam_role_policy_attachment" "additional" {
+#   for_each = module.eks.eks_managed_node_groups
+#   # you could also do the following or any combination:
+#   # for_each = merge(
+#   #   module.eks.eks_managed_node_groups,
+#   #   module.eks.self_managed_node_group,
+#   #   module.eks.fargate_profile,
+#   # )
+
+#   #            This policy does not have to exist at the time of cluster creation. Terraform can
+#   #            deduce the proper order of its creation to avoid errors during creation
+#   policy_arn = aws_iam_policy.worker_policy.arn
+#   role       = each.value.iam_role_name
+# }
 
 resource "aws_iam_policy" "worker_policy" {
   name        = "worker-policy"
@@ -102,7 +190,7 @@ resource "aws_iam_policy" "worker_policy" {
 # This is to add ingress controller through helm
 
 provider "helm" {
-  version = "2.5.0" # 1.3.1
+  # version = "2.5.0" # 1.3.1
   kubernetes {
     host                   = data.aws_eks_cluster.cluster.endpoint
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
