@@ -58,21 +58,63 @@ class Platform {
   }
 }
 
-const image = new Image();
-image.src = './img/platform.png';
-image.width = 580;
-image.height = 125;
+// No colision detection list Platform class above
+class GenericObject {
+  constructor({x, y, image}) {
+    this.position = {
+      x, // same as x: x
+      y,
+    }
+    this.image = image;
+    this.width = image.width;
+    this.height = image.height;
+
+  }
+
+  draw() {
+    c.drawImage(this.image, this.position.x, this.position.y);
+    // c.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+}
+
+// Images
+const platform = './img/platform.png';
+
 // const platform = new Image();
 // platform.src = './img/platform.png'
+const platformImage = createImage(platform)
+platformImage.width = 580;
+platformImage.height = 125;
 
-console.log(image.width);
+const hills = './img/hills.png';
+const background = './img/background.png';
+
+console.log(platform.width);
+
+function createImage(imageSrc) {
+  const image = new Image();
+  image.src = imageSrc;
+  return image;
+}
 
 // !
 const player = new Player();
 const platforms = [
-  new Platform({x: -1, y: 470, image}),
-  new Platform({x: image.width - 3, y: 470, image})
+  new Platform({x: -1, y: 470, image:platformImage}),
+  new Platform({x: platformImage.width - 3, y: 470, image: platformImage})
 ];
+const genericObjects = [
+  new GenericObject({
+    x: -1,
+    y: -1,
+    image: createImage(background)
+  }),
+  new GenericObject({
+    x: -1,
+    y: -1,
+    image: createImage(hills)
+  })
+]
 
 const keys = {
   right: {
@@ -91,6 +133,10 @@ function animate() {
   c.fillRect(0, 0, canvas.width, canvas.height);
   // c.clearRect(0, 0, canvas.width, canvas.height); // clear the canvas
 
+  genericObjects.forEach(genericObject => {
+    genericObject.draw();
+  })
+
   platforms.forEach(platform => {
     platform.draw();
   });
@@ -108,14 +154,22 @@ function animate() {
     if(keys.right.pressed) {
       scrollOffset += 5;
 
+      // Move scene
       platforms.forEach(platform => {
         platform.position.x -= 5;
+      });
+      genericObjects.forEach(genericObject => {
+        genericObject.position.x -= 3;
       });
     } else if (keys.left.pressed) {
       scrollOffset -= 5;
 
+      // Move scene
       platforms.forEach(platform => {
         platform.position.x += 5;
+      });
+      genericObjects.forEach(genericObject => {
+        genericObject.position.x += 3;
       });
     }
   }
