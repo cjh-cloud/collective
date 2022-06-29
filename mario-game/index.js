@@ -35,7 +35,7 @@ class Player {
 
     if (this.position.y + this.height + this.velocity.y <= canvas.height)
       this.velocity.y += gravity;
-    else this.velocity.y = 0;
+    // else this.velocity.y = 0; // we want the player to fall in gaps now that we have platforms
     
   }
 }
@@ -98,12 +98,13 @@ function createImage(imageSrc) {
 }
 
 // !
-const player = new Player();
-const platforms = [
+let player = new Player();
+let platforms = [
   new Platform({x: -1, y: 470, image:platformImage}),
-  new Platform({x: platformImage.width - 3, y: 470, image: platformImage})
+  new Platform({x: platformImage.width - 3, y: 470, image: platformImage}),
+  new Platform({x: platformImage.width *2 + 100, y: 470, image: platformImage})
 ];
-const genericObjects = [
+let genericObjects = [
   new GenericObject({
     x: -1,
     y: -1,
@@ -126,6 +127,39 @@ const keys = {
 } // this is for both types of pcs that send multi events on keydown, or only one
 
 let scrollOffset = 0; // how far have our platforms scrolled off screen
+
+function init() {
+  // !
+  player = new Player();
+  platforms = [
+    new Platform({x: -1, y: 470, image:platformImage}),
+    new Platform({x: platformImage.width - 3, y: 470, image: platformImage}),
+    new Platform({x: platformImage.width *2 + 100, y: 470, image: platformImage})
+  ];
+  genericObjects = [
+    new GenericObject({
+      x: -1,
+      y: -1,
+      image: createImage(background)
+    }),
+    new GenericObject({
+      x: -1,
+      y: -1,
+      image: createImage(hills)
+    })
+  ]
+
+  // keys = {
+  //   right: {
+  //     pressed: false
+  //   },
+  //   left: {
+  //     pressed: false
+  //   }
+  // } // this is for both types of pcs that send multi events on keydown, or only one
+
+  scrollOffset = 0; // how far have our platforms scrolled off screen
+}
 
 function animate() {
   requestAnimationFrame(animate);
@@ -185,8 +219,15 @@ function animate() {
     }
   });
 
+  // win condition
   if (scrollOffset > 2000) {
     console.log('you win');
+  }
+
+  // lose condition
+  if (player.position.y > canvas.height) {
+    console.log('you lose');
+    init(); // initalise everything
   }
 }
 
@@ -210,7 +251,7 @@ window.addEventListener('keydown', ({ keyCode }) => {
       break;
     case 87: // w
       console.log('up');
-      player.velocity.y -= 20; // canvas y starts at 0 and increases downwards
+      player.velocity.y -= 1; // canvas y starts at 0 and increases downwards
       break;
   }
 });
