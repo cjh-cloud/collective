@@ -179,7 +179,9 @@ function animate() {
   // player can't move past a certain point, and background starts scrolling
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = player.speed;
-  } else if (keys.left.pressed && player.position.x > 100) {
+  } else if ((keys.left.pressed && player.position.x > 100) 
+    || (keys.left.pressed && scrollOffset === 0 && player.position.x > 0) // can't move left past level start
+  ) {
     player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
@@ -194,7 +196,7 @@ function animate() {
       genericObjects.forEach(genericObject => {
         genericObject.position.x -= player.speed * 0.66;
       });
-    } else if (keys.left.pressed) {
+    } else if (keys.left.pressed && scrollOffset > 0) {
       scrollOffset -= player.speed;
 
       // Move scene
