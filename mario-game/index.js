@@ -7,10 +7,11 @@ const c = canvas.getContext('2d'); // 2d game canvas context
 canvas.width = 1024; // window.innerWidth;
 canvas.height = 576 // window.innerHeight;
 
-const gravity = 0.5;
+const gravity =  1; //0.5;
 
 class Player {
   constructor() {
+    this.speed = 10;
     this.position = {
       x: 100,
       y: 100
@@ -89,6 +90,11 @@ platformImage.height = 125;
 const hills = './img/hills.png';
 const background = './img/background.png';
 
+const platformSmallTall = './img/platformSmallTall.png';
+const platformSmallTallImage = createImage(platformSmallTall);
+platformSmallTallImage.width = 291;
+platformSmallTallImage.height = 227;
+
 console.log(platform.width);
 
 function createImage(imageSrc) {
@@ -100,21 +106,10 @@ function createImage(imageSrc) {
 // !
 let player = new Player();
 let platforms = [
-  new Platform({x: -1, y: 470, image:platformImage}),
-  new Platform({x: platformImage.width - 3, y: 470, image: platformImage}),
-  new Platform({x: platformImage.width *2 + 100, y: 470, image: platformImage})
+
 ];
 let genericObjects = [
-  new GenericObject({
-    x: -1,
-    y: -1,
-    image: createImage(background)
-  }),
-  new GenericObject({
-    x: -1,
-    y: -1,
-    image: createImage(hills)
-  })
+
 ]
 
 const keys = {
@@ -132,9 +127,13 @@ function init() {
   // !
   player = new Player();
   platforms = [
+    new Platform({x: platformImage.width *4 + 300 - 2 + platformImage.width - platformSmallTallImage.width, y: 270, image: createImage(platformSmallTall)}),
     new Platform({x: -1, y: 470, image:platformImage}),
     new Platform({x: platformImage.width - 3, y: 470, image: platformImage}),
-    new Platform({x: platformImage.width *2 + 100, y: 470, image: platformImage})
+    new Platform({x: platformImage.width *2 + 100, y: 470, image: platformImage}),
+    new Platform({x: platformImage.width *3 + 300, y: 470, image: platformImage}),
+    new Platform({x: platformImage.width *4 + 300 - 2, y: 470, image: platformImage}),
+    new Platform({x: platformImage.width *5 + 700 - 2, y: 470, image: platformImage})
   ];
   genericObjects = [
     new GenericObject({
@@ -179,31 +178,31 @@ function animate() {
 
   // player can't move past a certain point, and background starts scrolling
   if (keys.right.pressed && player.position.x < 400) {
-    player.velocity.x = 5;
+    player.velocity.x = player.speed;
   } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5;
+    player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
 
     if(keys.right.pressed) {
-      scrollOffset += 5;
+      scrollOffset += player.speed;
 
       // Move scene
       platforms.forEach(platform => {
-        platform.position.x -= 5;
+        platform.position.x -= player.speed;
       });
       genericObjects.forEach(genericObject => {
-        genericObject.position.x -= 3;
+        genericObject.position.x -= player.speed * 0.66;
       });
     } else if (keys.left.pressed) {
-      scrollOffset -= 5;
+      scrollOffset -= player.speed;
 
       // Move scene
       platforms.forEach(platform => {
-        platform.position.x += 5;
+        platform.position.x += player.speed;
       });
       genericObjects.forEach(genericObject => {
-        genericObject.position.x += 3;
+        genericObject.position.x += player.speed * 0.66;
       });
     }
   }
@@ -220,7 +219,7 @@ function animate() {
   });
 
   // win condition
-  if (scrollOffset > 2000) {
+  if (scrollOffset > platformImage.width * 5 + 400 - 2) {
     console.log('you win');
   }
 
@@ -231,6 +230,7 @@ function animate() {
   }
 }
 
+init();
 animate();
 
 // event listeners
@@ -244,14 +244,14 @@ window.addEventListener('keydown', ({ keyCode }) => {
     case 83: // s
       console.log('down');
       break;
-      case 68: // d
+    case 68: // d
       console.log('right');
       // player.velocity.x += 1;
       keys.right.pressed = true;
       break;
     case 87: // w
       console.log('up');
-      player.velocity.y -= 1; // canvas y starts at 0 and increases downwards
+      player.velocity.y -= 25; // canvas y starts at 0 and increases downwards
       break;
   }
 });
@@ -273,7 +273,7 @@ window.addEventListener('keyup', ({ keyCode }) => {
       break;
     case 87: // w
       console.log('up');
-      player.velocity.y -= 20; // canvas y starts at 0 and increases downwards
+      // player.velocity.y -= 20; // canvas y starts at 0 and increases downwards
       break;
   }
 });
