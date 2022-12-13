@@ -1,0 +1,13 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+
+metadata:
+  name: service-2048-tgb
+  namespace: orchestration
+
+spec:
+  serviceRef:
+    name: nlb-sample-service
+    port: 80
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-southeast-2:410239167650:targetgroup/my-cluster-0-b58c/7ac52e9e5ad50e33
+  targetType: ip

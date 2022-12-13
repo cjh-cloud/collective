@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  # - github.com/kubernetes/ingress-nginx.git/deploy/static/provider/aws?ref=controller-v0.44.0
+  # - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
+  - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/aws/deploy.yaml
+  - ./k8s/helloworldapp
+  - ./k8s/external-dns
+  - ./k8s/cert-manager
