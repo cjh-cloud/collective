@@ -4,3 +4,29 @@ metadata:
   name: {{ .Release.Name }}-configmap
 data:
   myvalue: "Hello World"
+  {{- $relname := .Release.Name -}}
+  {{- range $key, $val := .Values.favorite }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  {{- with .Values.favorite }}
+  # drink: {{ .drink | default "tea" | quote }}
+  # food: {{ .food | upper | quote }}
+  {{- if eq .drink "coffee" }}
+  mug: "true"
+  {{- end }}
+  version: {{ $.Release.Revision }}
+  releaseVar: {{ $relname }}
+  {{- end }}
+  release: {{ .Release.Name }}
+  toppings: |-
+    {{- range .Values.pizzaToppings }}
+    - {{ . | title | quote }}
+    {{- end }}
+  toppingsIndex: |-
+    {{- range $index, $topping := .Values.pizzaToppings }}
+      {{ $index }}: {{ $topping }}
+    {{- end }}
+  size: |-
+    {{- range tuple "small" "medium" "large" }}
+    - {{ . }}
+    {{- end }}
