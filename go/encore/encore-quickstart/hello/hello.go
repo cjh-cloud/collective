@@ -18,7 +18,7 @@ import (
 //
 //encore:api public path=/hello/:name
 func World(ctx context.Context, name string) (*Response, error) {
-	msg := "Howdy, " + name + "!"
+	msg := "Hey, " + name + "!"
 	return &Response{Message: msg}, nil
 }
 
