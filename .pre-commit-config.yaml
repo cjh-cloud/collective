@@ -1,0 +1,6 @@
+repos:
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.16.0"             # <VERSION, TAG, OR SHA TO USE> e.g. "v0.11.2"
+    hooks:
+      - id: terraform-docs-go
+        args: ["--output-file", "README.md", "--output-mode", "inject"] # ["ARGS", "TO PASS", "INCLUDING PATH"] e.g. ["--output-file", "README.md", "./mymodule/path"]
