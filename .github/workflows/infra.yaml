@@ -18,6 +18,11 @@ on:
       - terraform
 
 jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
   terraform:
     runs-on: ubuntu-latest
     container:
@@ -30,9 +35,6 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: list files in directory
         run: |
           ls -al
