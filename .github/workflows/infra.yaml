@@ -30,6 +30,8 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
+      volumes:
+        - ~/:/work
     permissions:
       contents: read
       packages: write
@@ -37,6 +39,7 @@ jobs:
     steps:
       - name: list files in directory
         run: |
+          pwd
           ls -al
           terraform --version
           terraform-docs --version
