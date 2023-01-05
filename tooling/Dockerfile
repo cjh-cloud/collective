@@ -75,6 +75,3 @@ RUN pre-commit --version && \
 
 USER ${APPUSER_NAME}
 WORKDIR /work
-
-
-
