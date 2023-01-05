@@ -1,9 +1,7 @@
 # syntax=docker/dockerfile:1.4
-FROM docker:20.10.10-dind-rootless as osbase
+FROM docker:20.10.10-dind as osbase
 
 USER root
-
-ENV DOCKER_HOST=unix:///run/user/1000/docker.sock
 
 WORKDIR /root
 
@@ -43,7 +41,6 @@ RUN mkdir -p terraform-docs && tar \
 FROM osbase as tooling
 USER root
 WORKDIR /root
-ARG APPUSER_NAME=rootless
 RUN --mount=type=cache,id=apk,target=/var/cache/apk/ \
     apk add --update \
         bash \
@@ -72,6 +69,3 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 RUN pre-commit --version && \
     terraform --version && \
     terraform-docs --version
-
-USER ${APPUSER_NAME}
-WORKDIR /work
