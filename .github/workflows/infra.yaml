@@ -23,6 +23,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: list files in directory
+        run: |
+          pwd
+          ls -al
+
   terraform:
     runs-on: ubuntu-latest
     container:
