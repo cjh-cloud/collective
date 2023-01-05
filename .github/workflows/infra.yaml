@@ -10,7 +10,7 @@
 # To get a newer version, you will need to update the SHA.
 # You can also reference a tag or branch, but the action may change without warning.
 
-name: Create and publish a Docker image
+name: Run Terraform
 
 on: 
   push:
@@ -30,21 +30,27 @@ jobs:
 
   terraform:
     runs-on: ubuntu-latest
+    needs: checkout
     container:
       image: ghcr.io/${{ github.repository }}:terraform
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
-      volumes:
-        - ${{ github.workspace }}:/work
+      # volumes:
+      #   - ${{ github.workspace }}:/work
     permissions:
       contents: read
       packages: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          path: /work
       - name: list files in directory
         run: |
           pwd
           ls -al
           terraform --version
           terraform-docs --version
+          ls -al /
