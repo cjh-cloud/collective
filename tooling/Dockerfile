@@ -37,6 +37,14 @@ RUN mkdir -p terraform-docs && tar \
     --gzip \
     --directory ./terraform-docs/
 
+FROM osbase as aws-cli
+ARG AWSCLI_VERSION=2.6.1
+
+RUN curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip -o awscliv2.zip
+RUN unzip awscliv2.zip
+RUN aws/install
+
+
 # Tooling image
 FROM osbase as tooling
 USER root
@@ -61,6 +69,29 @@ COPY --link --from=terraform --chown=root:root --chmod=755 \
 
 COPY --link --from=terraform-docs --chown=root:root --chmod=755 \
     /root/terraform-docs /usr/local/bin/
+
+COPY --link --from=aws-cli --chown=root:root --chmod=755 \
+    /usr/local/aws-cli/ /usr/local/aws-cli/
+COPY --link --from=aws-cli --chown=root:root --chmod=755 \
+    /usr/local/bin/ /usr/local/bin/
+
+# Install Glibc for AWS CLI to work in Alpine
+ARG GLIBC_VERSION=2.35-r0
+
+# install glibc compatibility for alpine
+RUN apk --no-cache add \
+        binutils \
+        curl \
+    && curl -sL https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub -o /etc/apk/keys/sgerrand.rsa.pub \
+    && curl -sLO https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk \
+    && curl -sLO https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-bin-${GLIBC_VERSION}.apk \
+    && curl -sLO https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-i18n-${GLIBC_VERSION}.apk \
+    && apk add --no-cache \
+        glibc-${GLIBC_VERSION}.apk \
+        glibc-bin-${GLIBC_VERSION}.apk \
+        glibc-i18n-${GLIBC_VERSION}.apk \
+    && /usr/glibc-compat/bin/localedef -i en_US -f UTF-8 en_US.UTF-8 \
+    && ln -sf /usr/glibc-compat/lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 
 
 COPY --from=golang:1.19-alpine /usr/local/go/ /usr/local/go/
 
