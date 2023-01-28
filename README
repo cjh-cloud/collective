@@ -1,0 +1,20 @@
+Project that has GitHub actions to:
+- build a CI/CD image
+- Use CI/CD image to run terraform and generate terraform docs (and commit them? or push to confluence)
+
+Terraform to deploy?
+- s3 bucket and dynamo for state
+- deploy eks cluster?
+
+App in the same project to deploy via helm chart? Would be better with Pulumi though
+
+# Install Terraform Docs
+$ brew install terraform-docs
+
+install pre-commit tool and use it to trigger terraform-docs (requires pip and python)
+
+Ascii docs? ascii doctor and ascii doctor diagram
+
+
+# Build image on M1 
+docker buildx build --platform=linux/amd64 -t tooling_aws . --load
