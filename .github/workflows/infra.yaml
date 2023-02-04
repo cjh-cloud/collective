@@ -18,16 +18,6 @@ on:
       - terraform
 
 jobs:
-  checkout:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: list files in directory
-        run: |
-          pwd
-          ls -al
-
   terraform:
     runs-on: ubuntu-latest
     needs: checkout
@@ -36,8 +26,6 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
-      # volumes:
-      #   - ${{ github.workspace }}:/work
     permissions:
       contents: read
       packages: write
@@ -52,3 +40,5 @@ jobs:
           terraform --version
           terraform-docs --version
           ls -al /
+          terraform init
+          terraform plan
