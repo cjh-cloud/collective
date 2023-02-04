@@ -20,7 +20,6 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    needs: checkout
     container:
       image: ghcr.io/${{ github.repository }}:terraform
       credentials:
