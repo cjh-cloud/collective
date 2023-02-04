@@ -39,5 +39,6 @@ jobs:
           terraform --version
           terraform-docs --version
           ls -al /
+          cd ./modules/
           terraform init
           terraform plan
