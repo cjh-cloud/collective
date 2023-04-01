@@ -1,0 +1,1 @@
+helm upgrade --install --create-namespace -n adot adot ./adot-fargate/

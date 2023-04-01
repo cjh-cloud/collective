@@ -1,0 +1,10 @@
+# pull metrics image with docker res, retag and push to ecr
+# https://aws-otel.github.io/docs/getting-started/container-insights/eks-fargate#design-of-container-insights-support-in-adot-collector-for-eks-fargate
+# https://github.com/aws-observability/aws-otel-collector/blob/main/deployment-template/eks/otel-fargate-container-insights.yaml
+
+
+namespace: "fargate-container-insights"
+clusterName: "eks-serverless"
+awsRegion: "ap-southeast-2"
+image: "amazon/aws-otel-collector"
+imageTag: "latest"
