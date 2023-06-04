@@ -2,6 +2,7 @@ THIS IS THE BEST EXAMPLE I HAVE SO FAR (I THINK)
 
 tf apply
 aws eks --region ap-southeast-2 update-kubeconfig --name eks-serverless
+aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
 kubectl apply -f 2048-game.yaml
 
 kubectl apply -f logger-server.yaml && kubectl -n orchestration expose deploy logger-server

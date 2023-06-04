@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubelet
+  labels:
+    k8s-app: kubelet
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kubelet
+  endpoints:
+  - port: metrics
+    path: /metrics/cadvisor
+    interval: 30s
+    honorLabels: true
+    metricRelabelings:
+      - sourceLabels: [__name__]
+        targetLabel: metric
+        regex: kubelet_(.*)_(.*)_(.*)
+        replacement: kubelet_$1_$3
+    metricMatchers:
+    - metricName: kubelet_running_pod_cpu_usage_seconds_total
+      # A pod is using too much CPU when its CPU usage is above 80% of the request
+      # specified in the pod's resource limits.
+      # See: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#algorithm-details
+      # Note that the "value" here is a string, so it needs to be quoted.
+      # Also note that this example assumes that the pod has CPU limits specified.
+      # If you're using a custom metric to scale your pods, you'll need to adjust
+      # this expression accordingly.
+      metricValues:
+      - value: '"{{ $value }} / {{ $labels.container_cpu_limit }}" > 0.8'
