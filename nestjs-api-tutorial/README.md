@@ -31,6 +31,18 @@ yarn start:dev
 nest g module user
 nest g module bookmark
 
+docker compose up dev-db -d
+
+yarn add -D prisma
+yarn add @prisma/client
+npx prisma init
+npx prisma migrate dev
+npx prisma studio
+nest g module prisma
+nest g service prisma --no-spec
+
+yarn add class-validator class-transformer
+
 ## Installation
 
 ```bash
