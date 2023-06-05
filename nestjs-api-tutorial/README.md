@@ -26,6 +26,11 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+https://www.youtube.com/watch?v=GHTA143_b-s
+yarn start:dev
+nest g module user
+nest g module bookmark
+
 ## Installation
 
 ```bash
