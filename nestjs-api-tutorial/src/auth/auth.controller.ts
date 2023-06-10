@@ -15,7 +15,7 @@ export class AuthController {
         // @Body('email') email: string,
         // @Body('password', ParseIntPipe) password: string
     ) {
-        return this.authService.signup();
+        return this.authService.signup(dto);
     }
 
     @Post('signin')

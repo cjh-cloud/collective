@@ -43,6 +43,10 @@ nest g service prisma --no-spec
 
 yarn add class-validator class-transformer
 
+yarn add argon2
+
+npx prisma migrate dev
+
 ## Installation
 
 ```bash
