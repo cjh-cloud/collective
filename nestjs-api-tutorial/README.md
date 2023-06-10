@@ -49,6 +49,9 @@ npx prisma migrate dev
 
 yarn add @nestjs/config
 
+yarn add @nestjs/passport passport @nestjs/jwt passport-jwt 
+yarn add -D @types/passport-jwt
+
 ## Installation
 
 ```bash
