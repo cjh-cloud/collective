@@ -54,6 +54,8 @@ yarn add -D @types/passport-jwt
 
 nest g controller user --no-spec
 
+yarn add -D pactum
+
 ## Installation
 
 ```bash
