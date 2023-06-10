@@ -47,6 +47,8 @@ yarn add argon2
 
 npx prisma migrate dev
 
+yarn add @nestjs/config
+
 ## Installation
 
 ```bash
