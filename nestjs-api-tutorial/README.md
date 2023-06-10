@@ -52,6 +52,8 @@ yarn add @nestjs/config
 yarn add @nestjs/passport passport @nestjs/jwt passport-jwt 
 yarn add -D @types/passport-jwt
 
+nest g controller user --no-spec
+
 ## Installation
 
 ```bash
