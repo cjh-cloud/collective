@@ -59,6 +59,8 @@ yarn add -D pactum
 yarn add -D dotenv-cli
 npx dotenv -e .env.test -- prisma studio
 
+nest g service user --no-spec
+
 ## Installation
 
 ```bash
