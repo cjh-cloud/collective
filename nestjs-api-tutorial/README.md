@@ -27,6 +27,7 @@
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 https://www.youtube.com/watch?v=GHTA143_b-s
+https://github.com/vladwulf/nestjs-api-tutorial
 yarn start:dev
 nest g module user
 nest g module bookmark
@@ -60,6 +61,9 @@ yarn add -D dotenv-cli
 npx dotenv -e .env.test -- prisma studio
 
 nest g service user --no-spec
+
+nest g controller bookmark --no-spec
+nest g service bookmark --no-spec
 
 ## Installation
 
