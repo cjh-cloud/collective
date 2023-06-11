@@ -56,6 +56,9 @@ nest g controller user --no-spec
 
 yarn add -D pactum
 
+yarn add -D dotenv-cli
+npx dotenv -e .env.test -- prisma studio
+
 ## Installation
 
 ```bash
