@@ -23,7 +23,7 @@ data "aws_availability_zones" "available" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.2.0" # 2.47.0
+  version = "5.0.0" #"3.2.0" # 2.47.0
 
   name                 = "k8s-vpc"
   cidr                 = "172.16.0.0/16"
@@ -140,9 +140,9 @@ module "eks" {
 resource "aws_eks_addon" "coredns" {
   addon_name = "coredns"
   # addon_version     = "v1.8.4-eksbuild.1"
-  cluster_name      = module.eks.cluster_name
-  resolve_conflicts = "OVERWRITE"
-  depends_on        = [module.eks]
+  cluster_name                = module.eks.cluster_name
+  resolve_conflicts_on_create = "OVERWRITE"
+  depends_on                  = [module.eks]
 
   # provisioner "local-exec" {
   #   command = "kubectl patch deployment coredns -n kube-system --type json -p='[{\"op\": \"remove\", \"path\": \"/spec/template/metadata/annotations/eks.amazonaws.com~1compute-type\"}]'"
