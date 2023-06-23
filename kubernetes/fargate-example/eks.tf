@@ -1,6 +1,6 @@
 # Define the user and role mappings for the aws-auth configmap:
 locals {
-  cluster_name = "my-cluster"
+  cluster_name = "eks-serverless"
   eks_aws_auth = {
     mapRoles = [
       {
@@ -53,7 +53,7 @@ module "vpc" {
 module "eks" {
   source                   = "terraform-aws-modules/eks/aws"
   version                  = "~> 19.0"
-  cluster_name             = "eks-serverless"
+  cluster_name             = local.cluster_name
   cluster_version          = "1.24"
   subnet_ids               = module.vpc.private_subnets
   control_plane_subnet_ids = module.vpc.public_subnets
@@ -133,6 +133,10 @@ module "eks" {
 
 }
 
+output "eks_cluster_name" {
+  value = module.eks.cluster_name
+}
+
 # While Fargate takes care of provisioning nodes as pods for the EKS cluster, 
 # it still needs a component that can manage the networking within the cluster nodes, 
 # coreDNS is that plugin for EKS Fargate, and like any other workload, needs a Fargate profile to run. 
@@ -148,23 +152,6 @@ resource "aws_eks_addon" "coredns" {
   #   command = "kubectl patch deployment coredns -n kube-system --type json -p='[{\"op\": \"remove\", \"path\": \"/spec/template/metadata/annotations/eks.amazonaws.com~1compute-type\"}]'"
   # }
 }
-
-# resource "null_resource" "coredns_patch" {
-#   provisioner "local-exec" {
-
-#     command = "sleep 60 && kubectl patch deployment coredns -n kube-system --type json -p='[{\"op\": \"remove\", \"path\": \"/spec/template/metadata/annotations/eks.amazonaws.com~1compute-type\"}]'"
-#   }
-# }
-
-# resource "kubernetes_namespace" "cert_manager" {
-#   depends_on = [
-#     module.eks
-#   ]
-
-#   metadata {
-#     name = "cert-manager"
-#   }
-# }
 
 # data "external" "oidc_thumbprint" {
 #   program = [
@@ -183,133 +170,4 @@ resource "aws_eks_addon" "coredns" {
 
 # data "aws_iam_openid_connect_provider" "oidc" {
 
-# }
-
-resource "helm_release" "cert_manager" {
-  depends_on = [
-    aws_eks_addon.coredns
-  ]
-
-  name             = "cert-manager"
-  chart            = "cert-manager"
-  create_namespace = true
-  repository       = "https://charts.jetstack.io"
-  version          = "1.11.0"
-  namespace        = "cert-manager" #kubernetes_namespace.cert_manager.id
-
-  set {
-    name  = "startupapicheck.timeout"
-    value = "5m"
-  }
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-  set {
-    name  = "webhook.securePort"
-    value = "10260"
-  }
-}
-
-# resource "aws_eks_addon" "adot" {
-#   depends_on = [
-#     helm_release.cert_manager
-#   ]
-
-#   addon_name = "adot"
-#   # addon_version     = "v1.8.4-eksbuild.1"
-#   cluster_name      = module.eks.cluster_name
-#   resolve_conflicts = "OVERWRITE"
-
-#   service_account_role_arn = aws_iam_role.adot_service_acc.arn
-# }
-
-variable "service_account_namespace" {
-  default = "fargate-container-insights" #"opentelemetry-operator-system"
-}
-
-variable "service_account_name" {
-  default = "adot-collector"
-}
-
-data "aws_iam_policy_document" "adot_trust_policy" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    principals {
-      type        = "Federated"
-      identifiers = [module.eks.oidc_provider_arn]
-    }
-    condition {
-      variable = "${module.eks.oidc_provider}:sub"
-      test     = "StringEquals"
-      values   = ["system:serviceaccount:${var.service_account_namespace}:${var.service_account_name}"]
-    }
-  }
-}
-
-resource "aws_iam_role" "adot_service_acc" {
-
-  name = "${var.env_name}-adot-role"
-
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  assume_role_policy = data.aws_iam_policy_document.adot_trust_policy.json
-
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonPrometheusRemoteWriteAccess",
-    "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess",
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-  ]
-
-  # tags = {
-  #   environment = var.env_name
-  # }
-}
-
-# TODO - moving to helm chart
-# resource "kubernetes_service_account" "adot" {
-#   metadata {
-#     name      = "adot-collector"
-#     namespace = var.service_account_namespace
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = aws_iam_role.adot_service_acc.arn
-#     }
-#   }
-# }
-
-output "adot_iam_role_arn" {
-  value = aws_iam_role.adot_service_acc.arn
-}
-
-# kubectl annotate serviceaccount -n $namespace $service_account eks.amazonaws.com/role-arn=arn:aws:iam::$account_id:role/my-role
-
-resource "kubernetes_namespace" "fargate_container_insights" {
-  metadata {
-    name = var.service_account_namespace #"fargate-container-insights"
-  }
-}
-
-# resource "aws_iam_policy" "policy" {
-#   name        = "test-policy"
-#   description = "A test policy"
-
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": [
-#         "ec2:Describe*"
-#       ],
-#       "Effect": "Allow",
-#       "Resource": "*"
-#     }
-#   ]
-# }
-# EOF
-# }
-
-# resource "aws_iam_role_policy_attachment" "test-attach" {
-#   role       = aws_iam_role.adot_service_acc.name
-#   policy_arn = aws_iam_policy.policy.arn
 # }

@@ -22,3 +22,39 @@ resource "helm_release" "metrics_server" {
     value = "kube-dns"
   }
 }
+
+# resource "kubernetes_namespace" "cert_manager" {
+#   depends_on = [
+#     module.eks
+#   ]
+
+#   metadata {
+#     name = "cert-manager"
+#   }
+# }
+
+resource "helm_release" "cert_manager" {
+  depends_on = [
+    aws_eks_addon.coredns
+  ]
+
+  name             = "cert-manager"
+  chart            = "cert-manager"
+  create_namespace = true
+  repository       = "https://charts.jetstack.io"
+  version          = "1.11.0"
+  namespace        = "cert-manager" #kubernetes_namespace.cert_manager.id
+
+  set {
+    name  = "startupapicheck.timeout"
+    value = "5m"
+  }
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
+  set {
+    name  = "webhook.securePort"
+    value = "10260"
+  }
+}
