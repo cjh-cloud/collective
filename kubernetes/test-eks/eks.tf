@@ -23,7 +23,7 @@ data "aws_availability_zones" "available" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.2.0" # 2.47.0
+  version = "5.0.0" #"3.2.0" # 2.47.0
 
   name                 = "k8s-vpc"
   cidr                 = "172.16.0.0/16"
@@ -43,23 +43,27 @@ module "vpc" {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = "1"
   }
+
+  tags = {
+    "kubernetes.io/cluster/vpc-serverless" = "shared"
+  }
 }
 
 # EKS cluster:
 module "eks" {
   source                               = "terraform-aws-modules/eks/aws"
-  version                              = "18.23.0"
+  version                              = "18.23.0" # TODO update
   aws_auth_roles                       = local.eks_aws_auth.mapRoles
   aws_auth_users                       = local.eks_aws_auth.mapUsers
   cluster_endpoint_private_access      = true
   cluster_endpoint_public_access       = true
   cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
   cluster_name                         = local.cluster_name # module.parameters.metadata.environment
-  cluster_version                      = "1.22"
+  cluster_version                      = "1.22"             # TODO udpate
   enable_irsa                          = true
   manage_aws_auth_configmap            = true
   subnet_ids                           = module.vpc.private_subnets #module.parameters.subnets.private
-  vpc_id                               = module.vpc.vpc_id #module.parameters.vpc.id
+  vpc_id                               = module.vpc.vpc_id          #module.parameters.vpc.id
 
   # EKS Managed Node Group(s):
   eks_managed_node_group_defaults = {

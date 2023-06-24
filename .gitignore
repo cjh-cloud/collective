@@ -6,3 +6,5 @@ v0.3.6.tar.gz
 terraform.tfstate
 terraform.tfstate.backup
 .terraform/
+
+.vscode/
