@@ -26,6 +26,13 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+$ nest new nestjs-cache
+$ yarn add cache-manager
+$ yarn add -D @types/cache-manager
+$ yarn add @nestjs/cache-manager # Default in nestjs is now deprecated
+$ yarn test app.service
+$ yarn add cache-manager-redis-store
+
 ## Installation
 
 ```bash
