@@ -26,12 +26,18 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+https://www.youtube.com/watch?v=KXnkhWRCj40
+A bit broken to be honest, redis seems a bit goofed on nestjs
+
 $ nest new nestjs-cache
 $ yarn add cache-manager
 $ yarn add -D @types/cache-manager
 $ yarn add @nestjs/cache-manager # Default in nestjs is now deprecated
 $ yarn test app.service
-$ yarn add cache-manager-redis-store
+
+$ yarn add redis@3.1.2 
+$ yarn add cache-manager@^4.1.0
+$ yarn add cache-manager-redis-store@^2.0.0
 
 ## Installation
 

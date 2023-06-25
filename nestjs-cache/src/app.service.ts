@@ -8,8 +8,8 @@ export class AppService {
 
   async getHello(): Promise<string> {
     await this.cacheManager.set('cached_item', { key: 32 }, 10); // 10 is the TTL
-    await this.cacheManager.del('cached_item');
-    await this.cacheManager.reset();
+    // await this.cacheManager.del('cached_item');
+    // await this.cacheManager.reset();
     const cachedItem = await this.cacheManager.get('cached_item');
     console.log(cachedItem);
     return 'Hello World!';
