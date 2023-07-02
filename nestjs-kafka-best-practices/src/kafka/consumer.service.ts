@@ -1,19 +1,28 @@
 import { Injectable, OnApplicationShutdown } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { Consumer, ConsumerRunConfig, ConsumerSubscribeTopics, Kafka } from "kafkajs";
+import { DatabaseService } from "src/database/database.service";
+import { IConsumer } from "./consumer.interface";
+import { KafkajsConsumerOptions } from "./kafkajs-consumer-options.interface";
+import { KafkajsConsumer } from "./kafkajs.consumer";
 
 @Injectable()
 export class ConsumerService implements OnApplicationShutdown {
-    private readonly kafka = new Kafka({
-        brokers: ['localhost:9092', '172.24.0.2:9092'],
-    });
-    private readonly consumers: Consumer[] = [];
+    private readonly consumers: IConsumer[] = [];
 
-    async consume(topic: ConsumerSubscribeTopics, config: ConsumerRunConfig) {
-        const consumer = this.kafka.consumer({ groupId: 'nestjs-kafka' });
+    // env vars config service
+    constructor(private readonly configService: ConfigService, private readonly databaseService: DatabaseService) { }
+
+    async consume({ topic, config, onMessage }: KafkajsConsumerOptions) {
+        const consumer = new KafkajsConsumer(
+            topic,
+            this.databaseService,
+            config,
+            this.configService.get('KAFKA_BROKER'),
+        );
         await consumer.connect();
-        await consumer.subscribe(topic);
-        await consumer.run(config);
-        this.consumers.push(consumer);
+        await consumer.consume(onMessage);
+        this.consumers.push(consumer); // push consumer to array of consumers so we can shut it down later
     }
 
     async onApplicationShutdown() {

@@ -36,6 +36,13 @@ $ docker compose up
 $ yarn start:dev
 Send a request to localhost:3000 to send a message to Kafka
 
+$ yarn add @nestjs/config
+$ yarn add async-retry
+$ yarn add @types/async-retry
+
+Copied stuff from this repo for /src/database - https://github.com/mguay22/nestjs-starter
+$ yarn add mongoose @nestjs/mongoose 
+
 ## Installation
 
 ```bash
