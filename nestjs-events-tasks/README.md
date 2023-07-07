@@ -26,6 +26,13 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+Nest.js | Events & Task Scheduling Tutorial 
+https://www.youtube.com/watch?v=btLyiMUs_Cw
+
+$ yarn add @nestjs/event-emitter
+$ yarn add @nestjs/schedule
+$ yarn add --dev @types/cron
+
 ## Installation
 
 ```bash
