@@ -26,6 +26,21 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+Nest.js Metrics - Prometheus & Grafana Tutorial
+https://www.youtube.com/watch?v=2ESOGJTXv1s
+
+$ yarn add @willsoto/nestjs-prometheus prom-client
+$ yarn add uuid
+
+$ docker buildx build --platform linux/amd64 -t nestjs-metrics .
+$ helm create nestjs-metrics
+$ cd templates
+$ kubectl create deployment nestjs-metrics --image=410239167650.dkr.ecr.ap-southeast-2.amazonaws.com/prometheus-sample-app:nestjs-metrics --port 3000 --dry-run=client -o yaml > deployment.yaml
+$ helm install nestjs-metrics . # will fail because of missing dependedncies
+$ helm dependency update
+
+
+
 ## Installation
 
 ```bash
