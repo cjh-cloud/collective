@@ -39,6 +39,10 @@ $ kubectl create deployment nestjs-metrics --image=410239167650.dkr.ecr.ap-south
 $ helm install nestjs-metrics . # will fail because of missing dependedncies
 $ helm dependency update
 
+Autoscale a Node.js App With Kubernetes & Keda
+https://www.youtube.com/watch?v=QWweMlerTZY
+$ docker buildx build --platform linux/amd64 -t nestjs-metrics .
+$ yarn add fibonacci
 
 
 ## Installation
