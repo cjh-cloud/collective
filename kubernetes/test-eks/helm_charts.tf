@@ -39,29 +39,29 @@ resource "helm_release" "metrics_server" {
 # }
 
 # Cert manager for ADOT if needed
-resource "helm_release" "cert_manager" {
-  depends_on = [
-    # aws_eks_addon.coredns
-    module.eks
-  ]
+# resource "helm_release" "cert_manager" {
+#   depends_on = [
+#     # aws_eks_addon.coredns
+#     module.eks
+#   ]
 
-  name             = "cert-manager"
-  chart            = "cert-manager"
-  create_namespace = true
-  repository       = "https://charts.jetstack.io"
-  version          = "1.12.0"
-  namespace        = "cert-manager" #kubernetes_namespace.cert_manager.id
+#   name             = "cert-manager"
+#   chart            = "cert-manager"
+#   create_namespace = true
+#   repository       = "https://charts.jetstack.io"
+#   version          = "1.12.0"
+#   namespace        = "cert-manager" #kubernetes_namespace.cert_manager.id
 
-  set {
-    name  = "startupapicheck.timeout"
-    value = "5m"
-  }
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-  # set {
-  #   name  = "webhook.securePort"
-  #   value = "10260"
-  # }
-}
+#   set {
+#     name  = "startupapicheck.timeout"
+#     value = "5m"
+#   }
+#   set {
+#     name  = "installCRDs"
+#     value = "true"
+#   }
+#   # set {
+#   #   name  = "webhook.securePort"
+#   #   value = "10260"
+#   # }
+# }

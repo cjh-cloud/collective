@@ -59,7 +59,7 @@ module "eks" {
   cluster_endpoint_public_access       = true
   cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
   cluster_name                         = local.cluster_name # module.parameters.metadata.environment
-  cluster_version                      = "1.22"             # TODO udpate
+  cluster_version                      = "1.27"
   enable_irsa                          = true
   manage_aws_auth_configmap            = true
   subnet_ids                           = module.vpc.private_subnets #module.parameters.subnets.private

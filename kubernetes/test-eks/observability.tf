@@ -286,13 +286,23 @@ resource "aws_iam_role_policy_attachment" "permission_policy_query" {
 # helm install my-prometheus prometheus-community/prometheus --version 20.1.0
 # helm upgrade --install prometheus prometheus-community/prometheus --create-namespace -n prometheus -f observability.yaml --version 20.1.0
 
+resource "kubernetes_namespace" "prometheus" {
+  depends_on = [
+    module.eks
+  ]
+
+  metadata {
+    name = "prometheus"
+  }
+}
+
 resource "helm_release" "prometheus" {
   name             = "prometheus-community"
   chart            = "prometheus"
-  create_namespace = true
+  create_namespace = false
   repository       = "https://prometheus-community.github.io/helm-charts"
   version          = "20.1.0"
-  namespace        = "prometheus" #kubernetes_namespace.cert_manager.id
+  namespace        = kubernetes_namespace.prometheus.id
 
   set {
     name  = "prometheus-node-exporter.enabled"
@@ -372,13 +382,17 @@ resource "aws_ecr_repository" "prometheus_sample_app" {
 
 # Prometheus sample app k8s deployment
 resource "kubernetes_deployment" "prometheus_sample_app" {
+  depends_on = [
+    helm_release.prometheus,
+  ]
+
   metadata {
     name      = "prometheus-sample-app-deployment"
     namespace = "prometheus"
   }
 
   spec {
-    replicas = 5
+    replicas = 1
     selector {
       match_labels = {
         app = "prometheus-sample-app"
@@ -423,6 +437,10 @@ resource "kubernetes_deployment" "prometheus_sample_app" {
 }
 
 resource "kubernetes_service" "prometheus_sample_app" {
+  depends_on = [
+    helm_release.prometheus,
+  ]
+
   metadata {
     name      = "prometheus-sample-app-service"
     namespace = "prometheus"
@@ -444,6 +462,125 @@ resource "kubernetes_service" "prometheus_sample_app" {
     selector = {
       app = "prometheus-sample-app"
     }
+  }
+}
+
+
+resource "kubernetes_deployment" "nodejs_app" {
+  depends_on = [
+    helm_release.prometheus,
+  ]
+  metadata {
+    name      = "nodejs-app"
+    namespace = "prometheus"
+  }
+
+  spec {
+    replicas = 1
+    selector {
+      match_labels = {
+        app = "nodejs-app"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "nodejs-app"
+        }
+        annotations = {
+          "prometheus.io/scrape" = "true"
+          "prometheus.io/path"   = "/metrics" # Nodejs
+          "prometheus.io/port"   = "3000"     # Nodejs
+        }
+      }
+      spec {
+        container {
+          image = "410239167650.dkr.ecr.ap-southeast-2.amazonaws.com/prometheus-sample-app:nestjs-metrics" #"${aws_ecr_repository.prometheus_sample_app.repository_url}:latest"
+          name  = "prometheus-sample-app"
+
+          port {
+            container_port = 3000 # Nodejs
+          }
+
+          resources {
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "nodejs_app" {
+  depends_on = [
+    helm_release.prometheus,
+  ]
+
+  metadata {
+    name      = "nodejs-app-service"
+    namespace = "prometheus"
+    labels = {
+      app = "nodejs-app"
+    }
+    annotations = {
+      scrape = "true"
+    }
+  }
+
+  spec {
+    port {
+      name        = "web"
+      port        = 3000
+      target_port = 3000
+      protocol    = "TCP"
+    }
+    selector = {
+      app = "nodejs-app"
+    }
+  }
+}
+
+# Load test - didn't work since it's just a default Hello World endpoint currently, but CPU did increase by 1%...
+# kubectl run -n prometheus -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://nodejs-app-service:3000; done"
+# kubectl get hpa -n prometheus -w
+resource "kubernetes_horizontal_pod_autoscaler_v2" "nodejs_app" {
+  depends_on = [
+    helm_release.prometheus,
+  ]
+
+  metadata {
+    name      = "nodejs-app-hpa"
+    namespace = "prometheus"
+  }
+
+  spec {
+    min_replicas = 1
+    max_replicas = 5
+
+    scale_target_ref {
+      api_version = "apps/v1"
+      kind        = "Deployment"
+      name        = "nodejs-app"
+    }
+
+    metric {
+      type = "Resource"
+      resource {
+        name = "cpu"
+        target {
+          average_utilization = 50
+          type                = "Utilization"
+        }
+      }
+    }
+
   }
 }
 
