@@ -297,6 +297,10 @@ resource "kubernetes_namespace" "prometheus" {
 }
 
 resource "helm_release" "prometheus" {
+  depends_on = [
+    kubernetes_namespace.prometheus
+  ]
+
   name             = "prometheus-community"
   chart            = "prometheus"
   create_namespace = false
@@ -495,7 +499,7 @@ resource "kubernetes_deployment" "nodejs_app" {
       }
       spec {
         container {
-          image = "410239167650.dkr.ecr.ap-southeast-2.amazonaws.com/prometheus-sample-app:nestjs-metrics" #"${aws_ecr_repository.prometheus_sample_app.repository_url}:latest"
+          image = "410239167650.dkr.ecr.ap-southeast-2.amazonaws.com/prometheus-sample-app:nestjs-metrics-fibonacci" #"${aws_ecr_repository.prometheus_sample_app.repository_url}:latest"
           name  = "prometheus-sample-app"
 
           port {
@@ -550,39 +554,39 @@ resource "kubernetes_service" "nodejs_app" {
 # Load test - didn't work since it's just a default Hello World endpoint currently, but CPU did increase by 1%...
 # kubectl run -n prometheus -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://nodejs-app-service:3000; done"
 # kubectl get hpa -n prometheus -w
-resource "kubernetes_horizontal_pod_autoscaler_v2" "nodejs_app" {
-  depends_on = [
-    helm_release.prometheus,
-  ]
+# resource "kubernetes_horizontal_pod_autoscaler_v2" "nodejs_app" {
+#   depends_on = [
+#     helm_release.prometheus,
+#   ]
 
-  metadata {
-    name      = "nodejs-app-hpa"
-    namespace = "prometheus"
-  }
+#   metadata {
+#     name      = "nodejs-app-hpa"
+#     namespace = "prometheus"
+#   }
 
-  spec {
-    min_replicas = 1
-    max_replicas = 5
+#   spec {
+#     min_replicas = 1
+#     max_replicas = 5
 
-    scale_target_ref {
-      api_version = "apps/v1"
-      kind        = "Deployment"
-      name        = "nodejs-app"
-    }
+#     scale_target_ref {
+#       api_version = "apps/v1"
+#       kind        = "Deployment"
+#       name        = "nodejs-app"
+#     }
 
-    metric {
-      type = "Resource"
-      resource {
-        name = "cpu"
-        target {
-          average_utilization = 50
-          type                = "Utilization"
-        }
-      }
-    }
+#     metric {
+#       type = "Resource"
+#       resource {
+#         name = "cpu"
+#         target {
+#           average_utilization = 50
+#           type                = "Utilization"
+#         }
+#       }
+#     }
 
-  }
-}
+#   }
+# }
 
 
 # TODO prometheus adapter - autoscaling with hpa

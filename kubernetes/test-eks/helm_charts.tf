@@ -1,31 +1,58 @@
 # Helm charts to install
 
 # https://artifacthub.io/packages/helm/metrics-server/metrics-server/3.9.0 - 3.10 did not work on Fargate
-resource "helm_release" "metrics_server" {
+# resource "helm_release" "metrics_server" {
+#   depends_on = [
+#     # aws_eks_addon.coredns
+#     module.eks
+#   ]
+
+#   name             = "metrics-server"
+#   chart            = "metrics-server"
+#   create_namespace = false
+#   repository       = "https://kubernetes-sigs.github.io/metrics-server/"
+#   version          = "3.9.0"
+#   namespace        = "kube-system" #kubernetes_namespace.cert_manager.id
+
+#   set {
+#     name  = "apiService.create"
+#     value = "true"
+#   }
+#   set {
+#     name  = "apiService.insecureSkipTLSVerify"
+#     value = "true"
+#   }
+#   set {
+#     name  = "podLabels.k8s-app"
+#     value = "kube-dns"
+#   }
+# }
+
+# helm repo add kedacore https://kedacore.github.io/charts
+resource "helm_release" "keda" {
   depends_on = [
-    # aws_eks_addon.coredns
     module.eks
   ]
 
-  name             = "metrics-server"
-  chart            = "metrics-server"
-  create_namespace = false
-  repository       = "https://kubernetes-sigs.github.io/metrics-server/"
-  version          = "3.9.0"
-  namespace        = "kube-system" #kubernetes_namespace.cert_manager.id
+  name             = "keda"
+  chart            = "keda"
+  create_namespace = true
+  repository       = "https://kedacore.github.io/charts"
+  version          = "2.11.1"
+  namespace        = "keda"
 
-  set {
-    name  = "apiService.create"
-    value = "true"
-  }
-  set {
-    name  = "apiService.insecureSkipTLSVerify"
-    value = "true"
-  }
-  set {
-    name  = "podLabels.k8s-app"
-    value = "kube-dns"
-  }
+  # set {
+  #   name  = "additionalAnnotations"
+  #   value = "eks.amazonaws.com/role-arn: arn:aws:iam::410239167650:role/amp-iamproxy-ingest-role"
+  # }
+
+  values = [
+    jsonencode({
+      additionalAnnotations = {
+        "eks.amazonaws.com/role-arn" = aws_iam_role.role_amp_ingest.arn
+      }
+    })
+  ]
 }
 
 # resource "kubernetes_namespace" "cert_manager" {
