@@ -26,6 +26,26 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+[BullMQ & Nest.js = Achieving Scale in Node.js](https://www.youtube.com/watch?v=oy-t6V6aAZY&list=WL&index=37)
+
+```bash
+$ yarn add @nestjs/bull bull
+$ yarn add -D @types/bull
+$ yarn add @nestjs/config
+
+$ docker run -p 6379:6379 redis
+
+$ docker buildx build --platform linux/amd64 -t nestjs-bullmq .
+```
+
+[Redis Helm Chart](https://artifacthub.io/packages/helm/bitnami/redis)
+Turn off auth thie auth.enabled = false
+
+To get logs of all instances
+```bash
+$ kubectl logs -l app=nestjs-bullmq -f 
+```
+
 ## Installation
 
 ```bash
