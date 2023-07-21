@@ -51,14 +51,32 @@ export class ItemsService {
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
-    // return `This action updates a #${id} item`;
-    const item = await this.itemsRepository.findOneBy({ id });
-    item.public = updateItemDto.public;
-    const comments = updateItemDto.comments.map(
-      (createCommentDto) => new Comment(createCommentDto),
-    );
-    item.comments = comments;
-    await this.entityManager.save(item);
+    // // return `This action updates a #${id} item`;
+    // const item = await this.itemsRepository.findOneBy({ id });
+    // item.public = updateItemDto.public;
+    // const comments = updateItemDto.comments.map(
+    //   (createCommentDto) => new Comment(createCommentDto),
+    // );
+    // item.comments = comments;
+    // await this.entityManager.save(item);
+
+    // Transaction
+    await this.entityManager.transaction(async (entityManager) => {
+      const item = await this.itemsRepository.findOneBy({ id });
+      item.public = updateItemDto.public;
+      const comments = updateItemDto.comments.map(
+        (createCommentDto) => new Comment(createCommentDto),
+      );
+      item.comments = comments;
+      await entityManager.save(item);
+
+      throw new Error(); // Will cause transaction to not be persisted, and will be rolled back.
+
+      // say we want to generate a unqiue tag for this item
+      const tagContent = `${Math.random()}`;
+      const tag = new Tag({ content: tagContent });
+      await entityManager.save(tag);
+    });
   }
 
   async remove(id: number) {
