@@ -37,6 +37,7 @@ npx prisma studio
 npx prisma db push
 nest g module auth
 nest g module prisma
+nest g service prisma
 
 
 ## Installation
