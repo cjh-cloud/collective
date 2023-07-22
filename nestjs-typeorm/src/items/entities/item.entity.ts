@@ -1,6 +1,6 @@
 // Repository? How we interact with the DB?
 
-import { AbstractEntity } from "src/database/abstract.entity";
+import { AbstractEntity } from "../../database/abstract.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Comment } from "./comments.entity";
 import { Listing } from "./listing.entity";

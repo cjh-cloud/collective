@@ -1,4 +1,4 @@
-import { AbstractEntity } from "src/database/abstract.entity";
+import { AbstractEntity } from "../../database/abstract.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 import { Item } from "./item.entity";
 

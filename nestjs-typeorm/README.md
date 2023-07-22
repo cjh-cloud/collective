@@ -35,6 +35,13 @@ yarn add @nestjs/config
 nest g module database
 nest g resource items
 
+yarn add dotenv
+
+<!-- Can't use yarn for below because of arg substitution -->
+npm run typeorm:create-migrations --name=PublicItems
+yarn typeorm migration:run -d ./typeOrm.config.ts
+yarn typeorm migration:revert -d ./typeOrm.config.ts
+
 ## Installation
 
 ```bash
