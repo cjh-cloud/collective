@@ -26,6 +26,19 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+NestJs JWT - Access Tokens & Refresh Tokens - Ultimate Guide
+https://www.youtube.com/watch?v=uAKzFhE3rxU
+
+yarn add -D prisma@latest
+yarn add @prisma/client
+npx prisma init
+npx prisma migrate dev --create-only
+npx prisma studio
+npx prisma db push
+nest g module auth
+nest g module prisma
+
+
 ## Installation
 
 ```bash
