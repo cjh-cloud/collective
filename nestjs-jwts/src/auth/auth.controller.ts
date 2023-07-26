@@ -13,7 +13,7 @@ export class AuthController {
   // Should return a promis of type Tokens which we defined
   @Post('/local/signup')
   signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    this.authService.signupLocal(dto);
+    return this.authService.signupLocal(dto);
   }
 
   @Post('/local/signin')
