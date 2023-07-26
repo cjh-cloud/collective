@@ -37,8 +37,15 @@ npx prisma studio
 npx prisma db push
 nest g module auth
 nest g module prisma
-nest g service prisma
-
+nest g service prisma --no-spec
+nest g controller auth --no-spec
+nest g service auth --no-spec
+yarn add class-validator class-transformer
+yarn add bcrypt
+yarn add -D @types/bcrypt
+yarn add @nestjs/jwt passport-jwt
+yarn add -D @types/passport-jwt
+yarn add @nestjs/passport passport
 
 ## Installation
 
