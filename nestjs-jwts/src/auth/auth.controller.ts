@@ -31,13 +31,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(@Req() req: Request) {
     const user = req.user;
-    return this.authService.logout(user['sub']); // sub was id, but that didn't exist
+    return this.authService.logout(user['sub']); // sub was id, but that didn't exist, sub is in the JWT token
   }
 
-  @UseGuards(AuthGuard('jwt-refresh')) // strategy is 'jwt-refresh' in at.strategy.ts
+  @UseGuards(AuthGuard('jwt-refresh')) // strategy is 'jwt-refresh' in at.strategy.ts, will block if you send the access token instead of the refresh token, as an example
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refreshTokens() {
+  refreshTokens(@Req() req: Request) {
+    const user = req.user;
+    return this.authService.refreshTokens(user['sub'], user['refreshToken']);
     // return this.authService.refreshTokens();
   }
 }
