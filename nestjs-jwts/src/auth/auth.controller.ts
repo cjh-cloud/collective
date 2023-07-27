@@ -14,6 +14,7 @@ export class AuthController {
   }
 
   // Should return a promis of type Tokens which we defined
+  @Public() // decorator to set isPublic to true
   @Post('local/signup')
   @HttpCode(HttpStatus.CREATED)
   signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
@@ -35,6 +36,7 @@ export class AuthController {
     return this.authService.logout(userId); // sub was id, but that didn't exist, sub is in the JWT token
   }
 
+  @Public() // decorator to set isPublic to true
   @UseGuards(RtGuard) // strategy is 'jwt-refresh' in at.strategy.ts, will block if you send the access token instead of the refresh token, as an example
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
