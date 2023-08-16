@@ -1,5 +1,8 @@
 How To Build A Complete JSON API In Goland (JWT, Postgres, and Docker Part 1)
-https://www.youtube.com/watch?v=pwZuNmAzaH8
+https://www.youtube.com/watch?v=pwZuNmAzaH8&list=PL0xRBLFXXsP6nudFDqMXzrvQCZrxSOm-2&index=1
 
 go mod init github.com/cjh-cloud/collective
 go get github.com/gorilla/mux
+
+docker run --name some-postgres -e POSTGRES_PASSWORD=gobank -p 5432:5432 -d postgres
+go get github.com/lib/pq
