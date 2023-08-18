@@ -6,3 +6,6 @@ go get github.com/gorilla/mux
 
 docker run --name some-postgres -e POSTGRES_PASSWORD=gobank -p 5432:5432 -d postgres
 go get github.com/lib/pq
+
+go get -u github.com/golang-jwt/jwt/v4
+export JWT_SECRET=something_secure
