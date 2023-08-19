@@ -27,6 +27,7 @@ func NewAPIServer(listenAddr string, store Storage) *APIServer {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
+	router.HandleFunc("/login", makeHTTPHandleFunc(s.handleLogin))
 	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
 	router.HandleFunc(
 		"/account/{id}", 
@@ -37,6 +38,42 @@ func (s *APIServer) Run() {
 	log.Println("JSON API server running on port: ", s.listenAddr)
 
 	http.ListenAndServe(s.listenAddr, router)
+}
+
+// 498081
+func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != "POST" {
+		return fmt.Errorf("method not allowed %s", r.Method)
+	}
+
+	var req LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil { // Think it checks it matches req struct
+		return err
+	}
+
+	// search the user
+	acc, err := s.store.GetAccountByNumber(int(req.Number))
+	if err != nil {
+		return err // handle this response as json
+	}
+
+	if !acc.ValidPassword(req.Password) {
+		return fmt.Errorf("not authenticated")
+	}
+
+	token, err := createJWT(acc)
+	if err != nil {
+		return err
+	}
+
+	resp := LoginResponse{
+		Token: token,
+		Number: acc.Number,
+	}
+
+	fmt.Printf("%+v\n", acc)
+
+	return WriteJSON(w, http.StatusOK, resp)
 }
 
 func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
@@ -97,23 +134,26 @@ func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
-	createAccountReq := new(CreateAccountRequest)
+	req := new(CreateAccountRequest)
 	// createAccountReq := CreateAccountRequest{} // have to use &createAccountReq below
-	if err := json.NewDecoder(r.Body).Decode(createAccountReq); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		return err
 	}
 
-	account := NewAccount(createAccountReq.FirstName, createAccountReq.LastName) // &Account{} // does the same thing
+	account, err := NewAccount(req.FirstName, req.LastName, req.Password) // &Account{} // does the same thing
+	if err != nil {
+		return err
+	}
 	if err := s.store.CreateAccount(account); err != nil {
 		return err
 	}
 
-	tokenString, err := createJWT(account)
-	if err != nil {
-		return err
-	}
+	// tokenString, err := createJWT(account)
+	// if err != nil {
+	// 	return err
+	// }
 
-	fmt.Println("JWT token: ", tokenString)
+	// fmt.Println("JWT token: ", tokenString)
 	
 	return WriteJSON(w, http.StatusOK, account)
 }

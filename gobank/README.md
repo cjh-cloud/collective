@@ -9,3 +9,8 @@ go get github.com/lib/pq
 
 go get -u github.com/golang-jwt/jwt/v4
 export JWT_SECRET=something_secure
+
+go get golang.org/x/crypto/bcrypt
+go get github.com/stretchr/testify/assert
+go test ./... -v
+./bin/gobank --seed // seeds the db by setting seed flag to true
