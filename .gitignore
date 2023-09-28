@@ -9,3 +9,7 @@ terraform.tfstate.backup
 /**/dist/
 .DS_Store
 .vscode/
+
+/**/.venv
+/**/data
+/**/bin
