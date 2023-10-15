@@ -35,5 +35,10 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 	}
 	
 	// Empty struct, marshal to payload object
+	respondWithJSON(w, 201, databaseUserToUser(user))
+}
+
+// Authenticated endpoint
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, 200, databaseUserToUser(user))
 }
