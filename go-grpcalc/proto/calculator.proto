@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package = "./pb";
+
+service Calculator {
+  rpc Add(CalculationRequest) returns (CalculationResponse);
+  rpc Divide(CalculationRequest) returns (CalculationResponse);
+  rpc Sum(NumbersRequest) returns (CalculationResponse);
+}
+
+message CalculationRequest {
+  int64 a = 1;
+  int64 b = 2;
+}
+
+message CalculationResponse {
+  optional int64 result = 1;
+  optional Error error = 2;
+}
+
+// repeated means we expect a list
+message NumbersRequest {
+  repeated int64 numbers = 1;
+}
+
+message Error {
+  int64 code = 1;
+  string msg = 2;
+}
